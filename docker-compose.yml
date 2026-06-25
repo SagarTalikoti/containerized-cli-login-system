@@ -1,0 +1,15 @@
+services:
+  cli-login:
+    build: .
+    stdin_open: true
+    tty: true
+    environment:
+      DB_PATH: /app/data/app.db
+      SESSION_TIMEOUT_MINUTES: 30
+      MAX_FAILED_ATTEMPTS: 5
+      LOCKOUT_MINUTES: 15
+    volumes:
+      - cli_data:/app/data
+
+volumes:
+  cli_data:

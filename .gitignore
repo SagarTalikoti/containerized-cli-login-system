@@ -1,0 +1,7 @@
+data/
+*.db
+*.db-shm
+*.db-wal
+cli-login
+cli-login.exe
+.cli-login-history
