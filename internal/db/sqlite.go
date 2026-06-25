@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
 );`
 
 func Open(path string) (*sql.DB, error) {
+	// Ensure the database directory exists for both local runs and Docker volumes.
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return nil, fmt.Errorf("create database directory: %w", err)
 	}
@@ -46,6 +47,7 @@ func Open(path string) (*sql.DB, error) {
 }
 
 func runMigrations(database *sql.DB) error {
+	// The migration is idempotent so the app can start safely with an existing DB.
 	if _, err := database.Exec(createUsersMigration); err != nil {
 		return fmt.Errorf("run migration 001_create_users.sql: %w", err)
 	}

@@ -22,6 +22,7 @@ func NewSessionManager(timeout time.Duration) *SessionManager {
 }
 
 func (m *SessionManager) Start(u *user.User) *Session {
+	// Sessions are intentionally in memory and expire after the configured timeout.
 	m.current = &Session{
 		UserID:    u.ID,
 		Username:  u.Username,
@@ -34,6 +35,7 @@ func (m *SessionManager) Current() (*Session, bool) {
 	if m.current == nil {
 		return nil, false
 	}
+	// Expired sessions are cleared before protected commands are allowed to run.
 	if time.Now().UTC().After(m.current.ExpiresAt) {
 		m.current = nil
 		return nil, false

@@ -70,6 +70,7 @@ func (s *Service) Login(username, password, totpCode string) (*user.User, error)
 		if strings.TrimSpace(totpCode) == "" {
 			return nil, ErrTOTPRequired
 		}
+		// Failed TOTP attempts count toward lockout to reduce brute-force risk.
 		if !ValidateTOTP(strings.TrimSpace(totpCode), u.TOTPSecret) {
 			if err := s.recordFailure(u, now); err != nil {
 				return nil, err
@@ -78,6 +79,7 @@ func (s *Service) Login(username, password, totpCode string) (*user.User, error)
 		}
 	}
 
+	// Show the previous login time to the user, then persist the new login time.
 	previousLastLogin := u.LastLoginAt
 	if err := s.users.RecordSuccessfulLogin(u.ID, now); err != nil {
 		return nil, err
@@ -109,6 +111,7 @@ func (s *Service) DisableMFA(u *user.User, code string) error {
 }
 
 func (s *Service) recordFailure(u *user.User, now time.Time) error {
+	// Consecutive failures lock the account temporarily after the configured limit.
 	attempts := u.FailedAttempts + 1
 	var lockedUntil *time.Time
 	if attempts >= s.maxFailedAttempts {

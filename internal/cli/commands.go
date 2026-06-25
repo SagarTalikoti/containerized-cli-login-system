@@ -144,6 +144,7 @@ func (a *App) enable2FA() {
 		return
 	}
 
+	// The generated secret is saved only after the user proves it works with a live code.
 	if err := a.auth.EnableMFA(current, code, key); err != nil {
 		fmt.Println("Could not enable 2FA:", cleanError(err))
 		return
